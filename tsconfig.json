@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": [
+      "es6",
+      "ESNext.String",
+      "dom",
+      "es2021"
+    ],
+    "moduleResolution": "node",
+    "strict": false,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "ES2015",
+    "module": "esnext",
+    "outDir": "dist",
+  },
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+  ],
+}
