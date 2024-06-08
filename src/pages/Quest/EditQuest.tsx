@@ -11,6 +11,7 @@ import { useNavigate, useParams } from "react-router";
 import { Quest } from "../../types/Quest";
 import { useSaveRecord, useRecord } from "../../hooks/useRecord";
 import { usePocket } from "../../contexts/pocketbase";
+import { Authenticated } from "../../components/Authenticated/Authenticated";
 
 export const EditQuest: FunctionComponent = () => {
   const params = useParams<{ questId: string }>();
@@ -112,7 +113,7 @@ export const EditQuest: FunctionComponent = () => {
     questRecord.isPending || saveQuest.isPending || generateQuest.isPending;
 
   return (
-    <div>
+    <Authenticated>
       {generateQuest.error ? (
         <div className="message is-danger">
           <div className="message-body">{generateQuest.error.message}</div>
@@ -244,6 +245,6 @@ export const EditQuest: FunctionComponent = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Authenticated>
   );
 };

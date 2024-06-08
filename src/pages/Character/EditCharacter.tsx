@@ -11,6 +11,7 @@ import { useNavigate, useParams } from "react-router";
 import { Character } from "../../types/Character";
 import { useSaveRecord, useRecord } from "../../hooks/useRecord";
 import { usePocket } from "../../contexts/pocketbase";
+import { Authenticated } from "../../components/Authenticated/Authenticated";
 
 export const EditCharacter: FunctionComponent = () => {
   const params = useParams<{ characterId: string }>();
@@ -116,7 +117,7 @@ export const EditCharacter: FunctionComponent = () => {
     generateCharacter.isPending;
 
   return (
-    <div>
+    <Authenticated>
       {generateCharacter.error ? (
         <div className="message is-danger">
           <div className="message-body">{generateCharacter.error.message}</div>
@@ -268,6 +269,6 @@ export const EditCharacter: FunctionComponent = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Authenticated>
   );
 };
