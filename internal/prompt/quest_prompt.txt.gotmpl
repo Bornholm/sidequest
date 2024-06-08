@@ -1,0 +1,31 @@
+Generate a tabletop roleplaying quest.
+
+Do not reuse existing plot from books, movies or any pre-existing work.
+
+{{if .Quest.Title }}
+- Title: {{ .Quest.Title }}
+{{ end }}
+{{if .Quest.Description }}
+- Description: {{ .Quest.Description }}
+{{ end }}
+{{if .Quest.Characters }}
+- Characters: {{ .Quest.Characters }}
+{{ end }}
+{{if .Quest.Clues }}
+- Clues: {{ .Quest.Clues }}
+{{ end }}
+{{if .Quest.Solution }}
+- Solution: {{ .Quest.Solution }}
+{{ end }}
+
+{{if .Universe.Style }}
+The quest should take place in a fictionnal universe of these style:
+
+{{ .Universe.Style }}
+{{ end }}
+
+Invent the missing parameters using the provided contextual elements. 
+
+You must provide a value for each required parameters.
+
+Your response must use the following language: {{ .Language }}

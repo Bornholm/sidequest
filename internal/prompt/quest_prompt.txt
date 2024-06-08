@@ -1,7 +1,0 @@
-Crée une intrigue de quête avec les paramètres suivants:
-
-- Thèmes: {{ .Quest.Themes }}
-
-Invente les paramètres manquants en t'inspirant de ces éléments de contexte.
-
-Répond en {{ .Language }}.

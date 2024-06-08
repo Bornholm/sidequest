@@ -117,35 +117,37 @@ export const EditCharacter: FunctionComponent = () => {
 
   return (
     <div>
-      <div className="level is-mobile">
+      <div className="level">
         <div className="level-left">
           <h2 className="title level-item">
             {isNew ? "New character" : `Character "${character.name}"`}
           </h2>
         </div>
         <div className="level-left">
-          <button
-            disabled={isLoading}
-            className={`button is-info level-item ${
-              isLoading ? "is-loading" : ""
-            }`}
-            onClick={onGenerateClick}
-          >
-            <strong>Generate</strong>
-          </button>
-          <button
-            disabled={isLoading}
-            className={`button is-primary level-item ${
-              isLoading ? "is-loading" : ""
-            }`}
-            onClick={onSaveClick}
-          >
-            <strong>Save</strong>
-          </button>
+          <div className="buttons">
+            <button
+              disabled={isLoading}
+              className={`button is-info level-item ${
+                isLoading ? "is-loading" : ""
+              }`}
+              onClick={onGenerateClick}
+            >
+              <strong>Generate</strong>
+            </button>
+            <button
+              disabled={isLoading}
+              className={`button is-primary level-item ${
+                isLoading ? "is-loading" : ""
+              }`}
+              onClick={onSaveClick}
+            >
+              <strong>Save</strong>
+            </button>
+          </div>
         </div>
       </div>
-      <div className="grid">
-        <div className="cell">
+      <div className="columns">
+        <div className="column">
           <div className="field">
             <label className="label">Name</label>
             <div className="control">
@@ -220,7 +222,7 @@ export const EditCharacter: FunctionComponent = () => {
             </div>
           </div>
         </div>
-        <div className="cell">
+        <div className="column">
           <div className="field">
             <label className="label">Story</label>
             <div className="control">

@@ -5,6 +5,7 @@ import { useCollection } from "../../hooks/useCollection";
 
 export const Dashboard: FunctionComponent = () => {
   const characterCollection = useCollection("characters");
+  const questCollection = useCollection("quests");
 
   return (
     <div className="columns">
@@ -18,6 +19,34 @@ export const Dashboard: FunctionComponent = () => {
               <strong>+</strong>
             </Link>
           </div>
+        </div>
+        <div className="table-container">
+          <table className="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Title</th>
+              </tr>
+            </thead>
+            <tbody>
+              {questCollection.data?.items.map((item) => {
+                return (
+                  <tr key={item.id}>
+                    <td>
+                      <Link to={`/quests/${item.id}`}>{item.title}</Link>
+                    </td>
+                  </tr>
+                );
+              })}
+              {!questCollection.data ||
+              questCollection.data?.items.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="has-text-centered">
+                    No quest yet. <Link to="/quests/new">Create one</Link>
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
         </div>
       </div>
       <div className="column">
@@ -50,6 +79,15 @@ export const Dashboard: FunctionComponent = () => {
                   </tr>
                 );
               })}
+              {!characterCollection.data ||
+              characterCollection.data?.items.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="has-text-centered">
+                    No character yet.{" "}
+                    <Link to="/characters/new">Create one</Link>
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

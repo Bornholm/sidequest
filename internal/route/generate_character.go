@@ -1,12 +1,9 @@
 package route
 
 import (
-	"bytes"
 	"encoding/json"
-	"html/template"
 	"net/http"
 
-	"github.com/bornholm/sidequest/internal/env"
 	"github.com/bornholm/sidequest/internal/llm"
 	"github.com/bornholm/sidequest/internal/llm/mistral"
 	"github.com/bornholm/sidequest/internal/prompt"
@@ -14,18 +11,6 @@ import (
 	"github.com/labstack/echo/v5"
 	"github.com/pkg/errors"
 )
-
-var (
-	mistralBaseURL   string
-	mistralAPIKey    string
-	mistralChatModel string
-)
-
-func init() {
-	mistralBaseURL = env.String("SIDEQUEST_MISTRAL_BASE_URL", "https://api.mistral.ai")
-	mistralAPIKey = env.String("SIDEQUEST_MISTRAL_API_KEY", "")
-	mistralChatModel = env.String("SIDEQUEST_MISTRAL_CHAT_MODEL", "mistral-large-latest")
-}
 
 var (
 	generateCharacterTool = mistral.Tool{
@@ -76,14 +61,10 @@ type Character struct {
 	Age        int    `json:"age"`
 }
 
-type CreateCharacterPromptData struct {
+type GenerateCharacterPromptData struct {
 	Language  string           `json:"archetype"`
 	Character CharacterContext `json:"character"`
 	Universe  UniverseContext  `json:"universe"`
-}
-
-type UniverseContext struct {
-	Style string `json:"style"`
 }
 
 type CharacterContext struct {
@@ -95,7 +76,7 @@ type CharacterContext struct {
 func GenerateCharacter(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	promptData := CreateCharacterPromptData{
+	promptData := GenerateCharacterPromptData{
 		Language: "FR-fr",
 		Character: CharacterContext{
 			Character: Character{},
@@ -166,24 +147,4 @@ func GenerateCharacter(c echo.Context) error {
 	}{
 		Character: character,
 	})
-}
-
-func GenerateQuest(c echo.Context) error {
-
-	return nil
-}
-
-func generatePrompt(rawTemplate string, data any) (string, error) {
-	promptTmpl, err := template.New("").Parse(rawTemplate)
-	if err != nil {
-		return "", errors.WithStack(err)
-	}
-
-	var prompt bytes.Buffer
-
-	if err := promptTmpl.Execute(&prompt, data); err != nil {
-		return "", errors.WithStack(err)
-	}
-
-	return prompt.String(), nil
 }
