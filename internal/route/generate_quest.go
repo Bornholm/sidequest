@@ -1,15 +1,10 @@
 package route
 
 import (
-	"encoding/json"
-	"net/http"
-
-	"github.com/bornholm/sidequest/internal/llm"
 	"github.com/bornholm/sidequest/internal/llm/mistral"
 	"github.com/bornholm/sidequest/internal/prompt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v5"
-	"github.com/pkg/errors"
+	"github.com/pocketbase/pocketbase"
 )
 
 var (
@@ -57,7 +52,7 @@ type Quest struct {
 }
 
 type GenerateQuestPromptData struct {
-	Language string          `json:"archetype"`
+	Language string          `json:"language"`
 	Quest    QuestContext    `json:"quest"`
 	Universe UniverseContext `json:"universe"`
 }
@@ -66,78 +61,16 @@ type QuestContext struct {
 	Quest `json:",inline"`
 }
 
-func GenerateQuest(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	promptData := GenerateQuestPromptData{
-		Language: "FR-fr",
-		Quest: QuestContext{
-			Quest: Quest{},
+func GenerateQuest(app *pocketbase.PocketBase) echo.HandlerFunc {
+	return createGenerateHandler[GenerateQuestPromptData](
+		app, prompt.Quest,
+		generateQuestTool,
+		func(quest Quest) any {
+			return struct {
+				Quest Quest `json:"quest"`
+			}{
+				Quest: quest,
+			}
 		},
-	}
-
-	if err := c.Bind(&promptData); err != nil {
-		return errors.WithStack(err)
-	}
-
-	srv := mistral.NewService(mistralBaseURL, mistralAPIKey, mistralChatModel)
-
-	sess, err := srv.Chat(ctx, llm.NewMessage("system", prompt.Agent, nil))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	questPrompt, err := generatePrompt(prompt.Quest, promptData)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	spew.Dump(questPrompt)
-
-	response, err := sess.Send(
-		ctx, llm.NewMessage("user", questPrompt, nil),
-		llm.WithTemperature(0.8),
-		mistral.WithTools(
-			mistral.ToolChoiceAny,
-			generateQuestTool,
-		),
 	)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	spew.Dump(response)
-
-	mistralResponse, ok := response.(*mistral.ChatResponse)
-	if !ok {
-		return errors.Errorf("unexpected llm response type '%T'", response)
-	}
-
-	if len(mistralResponse.Choices) == 0 {
-		return errors.New("no choice available")
-	}
-
-	choice := mistralResponse.Choices[0]
-
-	if len(choice.Message.ToolCalls) == 0 {
-		return errors.New("no tool call available")
-	}
-
-	toolCall := choice.Message.ToolCalls[0]
-
-	if toolCall.Function.Name != generateQuestTool.Function.Name {
-		return errors.Errorf("unexpected tool call '%s'", toolCall.Function.Name)
-	}
-
-	var quest Quest
-
-	if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &quest); err != nil {
-		return errors.Wrapf(err, "could not unmarshal executed tool call arguments")
-	}
-
-	return c.JSON(http.StatusOK, struct {
-		Quest Quest `json:"quest"`
-	}{
-		Quest: quest,
-	})
 }

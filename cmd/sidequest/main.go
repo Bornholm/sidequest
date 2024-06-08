@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log/slog"
+	"log"
 	"os"
 
 	"github.com/bornholm/sidequest/internal/env"
@@ -31,14 +31,14 @@ func main() {
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		group := e.Router.Group("/api/generate", apis.ActivityLogger(app), apis.RequireAdminOrRecordAuth())
-		group.POST("/character", route.GenerateCharacter)
-		group.POST("/quest", route.GenerateQuest)
+		group.POST("/character", route.GenerateCharacter(app))
+		group.POST("/quest", route.GenerateQuest(app))
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS(publicDir), true))
 		return nil
 	})
 
 	if err := app.Start(); err != nil {
-		slog.Error("could not start app", slog.AnyValue(errors.WithStack(err)))
+		log.Fatalf("%+v", errors.WithStack(err))
 		os.Exit(1)
 	}
 }

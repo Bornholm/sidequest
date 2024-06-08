@@ -117,6 +117,11 @@ export const EditCharacter: FunctionComponent = () => {
 
   return (
     <div>
+      {generateCharacter.error ? (
+        <div className="message is-danger">
+          <div className="message-body">{generateCharacter.error.message}</div>
+        </div>
+      ) : null}
       <div className="level">
         <div className="level-left">
           <h2 className="title level-item">

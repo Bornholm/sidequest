@@ -113,6 +113,11 @@ export const EditQuest: FunctionComponent = () => {
 
   return (
     <div>
+      {generateQuest.error ? (
+        <div className="message is-danger">
+          <div className="message-body">{generateQuest.error.message}</div>
+        </div>
+      ) : null}
       <div className="level">
         <div className="level-left">
           <h2 className="title level-item">

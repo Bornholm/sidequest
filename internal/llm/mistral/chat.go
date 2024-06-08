@@ -45,6 +45,11 @@ type ChatResponse struct {
 		FinishReason string   `json:"finish_reason"`
 		Message      *Message `json:"message"`
 	} `json:"choices"`
+	Usage struct {
+		PromptTokens     int `json:"prompt_tokens"`
+		CompletionTokens int `json:"completion_tokens"`
+		TotalTokens      int `json:"total_tokens"`
+	} `json:"usage"`
 	Error *struct {
 		Code    int    `json:"code"`
 		Message string `json:"message"`

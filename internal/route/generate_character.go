@@ -1,15 +1,10 @@
 package route
 
 import (
-	"encoding/json"
-	"net/http"
-
-	"github.com/bornholm/sidequest/internal/llm"
 	"github.com/bornholm/sidequest/internal/llm/mistral"
 	"github.com/bornholm/sidequest/internal/prompt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v5"
-	"github.com/pkg/errors"
+	"github.com/pocketbase/pocketbase"
 )
 
 var (
@@ -62,7 +57,7 @@ type Character struct {
 }
 
 type GenerateCharacterPromptData struct {
-	Language  string           `json:"archetype"`
+	Language  string           `json:"language"`
 	Character CharacterContext `json:"character"`
 	Universe  UniverseContext  `json:"universe"`
 }
@@ -73,78 +68,16 @@ type CharacterContext struct {
 	Archetype string `json:"archetype"`
 }
 
-func GenerateCharacter(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	promptData := GenerateCharacterPromptData{
-		Language: "FR-fr",
-		Character: CharacterContext{
-			Character: Character{},
+func GenerateCharacter(app *pocketbase.PocketBase) echo.HandlerFunc {
+	return createGenerateHandler[GenerateCharacterPromptData](
+		app, prompt.Quest,
+		generateQuestTool,
+		func(character Character) any {
+			return struct {
+				Character Character `json:"character"`
+			}{
+				Character: character,
+			}
 		},
-	}
-
-	if err := c.Bind(&promptData); err != nil {
-		return errors.WithStack(err)
-	}
-
-	srv := mistral.NewService(mistralBaseURL, mistralAPIKey, mistralChatModel)
-
-	sess, err := srv.Chat(ctx, llm.NewMessage("system", prompt.Agent, nil))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	characterPrompt, err := generatePrompt(prompt.Character, promptData)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	spew.Dump(characterPrompt)
-
-	response, err := sess.Send(
-		ctx, llm.NewMessage("user", characterPrompt, nil),
-		llm.WithTemperature(0.8),
-		mistral.WithTools(
-			mistral.ToolChoiceAny,
-			generateCharacterTool,
-		),
 	)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	spew.Dump(response)
-
-	mistralResponse, ok := response.(*mistral.ChatResponse)
-	if !ok {
-		return errors.Errorf("unexpected llm response type '%T'", response)
-	}
-
-	if len(mistralResponse.Choices) == 0 {
-		return errors.New("no choice available")
-	}
-
-	choice := mistralResponse.Choices[0]
-
-	if len(choice.Message.ToolCalls) == 0 {
-		return errors.New("no tool call available")
-	}
-
-	toolCall := choice.Message.ToolCalls[0]
-
-	if toolCall.Function.Name != generateCharacterTool.Function.Name {
-		return errors.Errorf("unexpected tool call '%s'", toolCall.Function.Name)
-	}
-
-	var character Character
-
-	if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &character); err != nil {
-		return errors.Wrapf(err, "could not unmarshal executed tool call arguments")
-	}
-
-	return c.JSON(http.StatusOK, struct {
-		Character Character `json:"character"`
-	}{
-		Character: character,
-	})
 }
