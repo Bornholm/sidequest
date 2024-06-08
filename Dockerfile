@@ -1,6 +1,6 @@
 FROM alpine:3.20 as build
 
-RUN apk add --no-cache nodejs npm go make
+RUN apk add --no-cache nodejs npm go make bash
 
 WORKDIR /src
 
