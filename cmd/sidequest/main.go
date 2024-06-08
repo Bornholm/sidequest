@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bornholm/sidequest/internal/env"
+	"github.com/bornholm/sidequest/internal/route"
 	"github.com/pkg/errors"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
@@ -29,6 +30,9 @@ func main() {
 	})
 
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
+		group := e.Router.Group("/api/generate", apis.ActivityLogger(app), apis.RequireAdminOrRecordAuth())
+		group.POST("/character", route.GenerateCharacter)
+		group.POST("/quest", route.GenerateQuest)
 		e.Router.GET("/*", apis.StaticDirectoryHandler(os.DirFS(publicDir), true))
 		return nil
 	})

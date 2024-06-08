@@ -26,7 +26,7 @@ export const NavBar: FunctionComponent = () => {
 
           <a
             role="button"
-            className="navbar-burger"
+            className="navbar-burger has-text-black"
             aria-label="menu"
             aria-expanded={isActive ? "true" : "false"}
             onClick={onNavbarBurgerClick}

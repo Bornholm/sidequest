@@ -2,3 +2,4 @@
 /data
 /dist/js
 /bin
+/.env

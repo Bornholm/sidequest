@@ -8,6 +8,7 @@ import { Login } from "./pages/Login/Login";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
+import { EditCharacter } from "./pages/Character/EditCharacter";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,10 @@ const App: FunctionComponent = () => {
               <Route path="/" index element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/characters/:characterId"
+                element={<EditCharacter />}
+              />
             </Route>
           </Routes>
         </BrowserRouter>
