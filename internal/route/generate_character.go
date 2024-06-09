@@ -38,7 +38,7 @@ var (
 					},
 					"objectives": {
 						"type":        "string",
-						"description": "The life objectives of the character. Should not be empty",
+						"description": "The life objectives of the character. Non empty.",
 					},
 				},
 				"required": []string{"name", "story", "sex", "age", "race", "objectives"},
@@ -70,8 +70,8 @@ type CharacterContext struct {
 
 func GenerateCharacter(app *pocketbase.PocketBase) echo.HandlerFunc {
 	return createGenerateHandler[GenerateCharacterPromptData](
-		app, prompt.Quest,
-		generateQuestTool,
+		app, prompt.Character,
+		generateCharacterTool,
 		func(character Character) any {
 			return struct {
 				Character Character `json:"character"`
